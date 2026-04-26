@@ -1,8 +1,10 @@
 """Agent base class and persona loader.
 
-Personas are declarative (YAML); agent classes are thin adapters that bind a
-persona to a LangGraph node. This separation keeps prompt/tool-policy edits
-out of Python source — see docs/research/personas.md.
+Personas are declarative — preferred format is one Markdown file per role under
+``src/autoresearch/agents/personas/<role>.md`` with YAML frontmatter
+(``role``, ``allowed_tools``) and a Markdown body that becomes the system
+prompt. The legacy ``personas.yaml`` is still loaded as a fallback for any
+role without a Markdown file.
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ from ..llm import LLMClient
 from ..state import GraphState
 
 PERSONAS_FILE = Path(__file__).with_name("personas.yaml")
+PERSONAS_DIR = Path(__file__).with_name("personas")
 
 
 @dataclass(frozen=True)
@@ -29,7 +32,28 @@ class Persona:
     allowed_tools: tuple[str, ...]
 
 
+def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
+    """Split a markdown file with YAML frontmatter delimited by '---' lines."""
+    if not text.startswith("---"):
+        return {}, text
+    end = text.find("\n---", 3)
+    if end == -1:
+        return {}, text
+    fm = yaml.safe_load(text[3:end]) or {}
+    body = text[end + 4 :].lstrip("\n")
+    return fm, body
+
+
 def load_persona(name: str, path: Path = PERSONAS_FILE) -> Persona:
+    md = PERSONAS_DIR / f"{name}.md"
+    if md.exists():
+        fm, body = _parse_frontmatter(md.read_text(encoding="utf-8"))
+        return Persona(
+            name=name,
+            role=str(fm.get("role", name)),
+            system_prompt=body,
+            allowed_tools=tuple(fm.get("allowed_tools", []) or []),
+        )
     data: dict[str, Any] = yaml.safe_load(path.read_text())
     spec = data[name]
     return Persona(

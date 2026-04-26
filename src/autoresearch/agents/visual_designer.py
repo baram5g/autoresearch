@@ -17,6 +17,7 @@ from .base import LLMAgent, Persona
 class ImagePrompt(BaseModel):
     slide_index: int = Field(..., ge=0)
     prompt: str
+    alt: str | None = None
 
 
 class VisualDesignerOutput(BaseModel):
@@ -62,5 +63,7 @@ class VisualDesignerAgent(LLMAgent):
                 for block in new_plan.slides[ip.slide_index].blocks:
                     if block.kind == "image":
                         block.body["prompt"] = ip.prompt
+                        if ip.alt is not None:
+                            block.body["alt"] = ip.alt
                 self.prompt_store.remember(ip.slide_index, ip.prompt)
         return {"deck_plan": new_plan}

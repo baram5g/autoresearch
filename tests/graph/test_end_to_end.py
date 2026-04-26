@@ -72,6 +72,22 @@ def _good_deck_slides() -> list[SlidePlan]:
                          body={"center": "Anti-bribery",
                                "nodes": ["Gifts", "Hospitality", "3rd parties", "Donations"]}),
         ]),
+        SlidePlan(layout="bullets", blocks=[
+            ContentBlock(kind="bullets", title="Action checklist", body={
+                "items": [
+                    "Decline gifts above the policy threshold",
+                    "Log every received gift in the register",
+                    "Escalate suspected bribery within 24 hours",
+                ],
+            }, citations=["[N4]"]),
+        ]),
+        SlidePlan(layout="quiz", blocks=[
+            ContentBlock(kind="quiz", title="Final check", body={
+                "question": "When must you log a received gift?",
+                "options": ["Never", "Always", "Only above $50"],
+                "answer": "C",
+            }),
+        ]),
     ]
 
 

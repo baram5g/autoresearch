@@ -23,7 +23,7 @@ Audience: procurement partners
 |---|---|---|---|
 | Objective coverage | 0.00 | 1.00 | +1.00 |
 | Content variety | 0.29 | 1.00 | +0.71 |
-| Citation density | 0.00 | 0.89 | +0.89 |
+| Citation density | 0.00 | 0.91 | +0.91 |
 | Quiz density | 0.00 | 1.00 | +1.00 |
 | Scenario presence | 0.00 | 1.00 | +1.00 |
 | **Total** | **0.06** | **0.98** | **+0.92** |
@@ -38,7 +38,7 @@ Audience: EU partners
 |---|---|---|---|
 | Objective coverage | 0.00 | 1.00 | +1.00 |
 | Content variety | 0.29 | 1.00 | +0.71 |
-| Citation density | 0.00 | 0.89 | +0.89 |
+| Citation density | 0.00 | 0.91 | +0.91 |
 | Quiz density | 0.00 | 1.00 | +1.00 |
 | Scenario presence | 0.00 | 1.00 | +1.00 |
 | **Total** | **0.06** | **0.98** | **+0.92** |

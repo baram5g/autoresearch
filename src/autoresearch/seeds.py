@@ -208,13 +208,55 @@ def upgraded_client(topic: str, audience: str) -> tuple[FakeLLMClient, FakeWebSe
                 citations=["[N4]"],
             ),
         ]),
+        SlidePlan(layout="bullets", blocks=[
+            ContentBlock(
+                kind="bullets",
+                title="Action checklist",
+                body={
+                    "items": [
+                        "Decline gifts that exceed the policy threshold",
+                        "Log every received gift in the central register",
+                        "Escalate suspected bribery to compliance within 24 hours",
+                    ],
+                },
+                citations=["[N4]"],
+            ),
+        ]),
+        SlidePlan(layout="quiz", blocks=[
+            ContentBlock(
+                kind="quiz",
+                title="Final check",
+                body={
+                    "question": "Which gift must always be logged?",
+                    "options": [
+                        "Any gift above the policy threshold",
+                        "Promotional pens",
+                        "Branded notebooks",
+                    ],
+                    "answer": "A",
+                },
+                citations=["[N4]"],
+            ),
+        ]),
     ]
     client.script("instructional_designer", [
         DesignerOutput(learning_objectives=objectives, slides=slides),
     ])
     client.script("visual_designer", [
         VisualDesignerOutput(image_prompts=[
-            ImagePrompt(slide_index=7, prompt=f"A {audience} reviewing a contract while declining a gift, modern office, neutral palette"),
+            ImagePrompt(
+                slide_index=7,
+                prompt=(
+                    f"A diverse group of {audience}, mixed ages and ethnicities, "
+                    "reviewing a contract while declining a wrapped gift; modern "
+                    "open-plan office, soft daylight from large windows, neutral "
+                    "palette, 35mm f/2.8 documentary photography"
+                ),
+                alt=(
+                    f"Two {audience} colleagues at a desk politely declining a gift "
+                    "while reviewing contract paperwork."
+                ),
+            ),
         ]),
     ])
     client.script("qa_reviewer", [QAOutput(findings=["Citations resolve; pedagogy sound."])])

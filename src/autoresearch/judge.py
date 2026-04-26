@@ -29,6 +29,11 @@ from pydantic import BaseModel
 from .state import DeckPlan
 
 _FACTUAL_KINDS = {"bullets", "infographic", "table", "diagram", "flowchart"}
+_INCLUSIVE_TOKENS = {
+    "diverse", "inclusive", "multiethnic", "multi-ethnic", "multigenerational",
+    "wheelchair", "hijab", "various", "mixed", "ages", "ethnicities",
+    "gender-balanced", "neurodiverse", "global", "international",
+}
 _STOPWORDS = {
     "the", "a", "an", "and", "or", "of", "for", "to", "in", "on", "at",
     "with", "by", "from", "as", "is", "be", "this", "that", "these", "those",
@@ -42,6 +47,7 @@ class DeckJudgement(BaseModel):
     citation_per_factual_block: float
     objective_alignment_per_slide: float
     audience_specificity: float
+    inclusive_imagery_specificity: float
     total: float
 
     def as_table(self) -> str:
@@ -51,6 +57,7 @@ class DeckJudgement(BaseModel):
             ("Citation per factual block", self.citation_per_factual_block),
             ("Objective alignment / slide", self.objective_alignment_per_slide),
             ("Audience specificity", self.audience_specificity),
+            ("Inclusive imagery specificity", self.inclusive_imagery_specificity),
             ("Total", self.total),
         ]
         return "\n".join(f"  {name:<32} {v:.2f}" for name, v in rows)
@@ -131,12 +138,36 @@ def judge_deck(plan: DeckPlan) -> DeckJudgement:
     else:
         audience_specificity = 0.0
 
+    # 6. Inclusive imagery specificity: per-image-block check that the prompt
+    #    is non-trivially long, contains an inclusive descriptor, and has
+    #    alt-text. Decks with no image blocks score 1.0 (no penalty).
+    image_blocks = [
+        b for s in plan.slides for b in s.blocks if b.kind == "image"
+    ]
+    if image_blocks:
+        good = 0
+        for b in image_blocks:
+            body = b.body or {}
+            prompt = str(body.get("prompt", "") or "")
+            alt = str(body.get("alt", "") or "")
+            tokens = _tokens(prompt)
+            if (
+                len(prompt.split()) >= 12
+                and (tokens & _INCLUSIVE_TOKENS)
+                and alt.strip()
+            ):
+                good += 1
+        inclusive_imagery_specificity = good / len(image_blocks)
+    else:
+        inclusive_imagery_specificity = 1.0
+
     total = (
-        0.25 * narrative_flow
-        + 0.20 * block_distribution_entropy
-        + 0.20 * citation_per_factual_block
-        + 0.20 * objective_alignment_per_slide
-        + 0.15 * audience_specificity
+        0.20 * narrative_flow
+        + 0.18 * block_distribution_entropy
+        + 0.18 * citation_per_factual_block
+        + 0.18 * objective_alignment_per_slide
+        + 0.13 * audience_specificity
+        + 0.13 * inclusive_imagery_specificity
     )
     return DeckJudgement(
         narrative_flow=narrative_flow,
@@ -144,5 +175,6 @@ def judge_deck(plan: DeckPlan) -> DeckJudgement:
         citation_per_factual_block=citation_per_factual_block,
         objective_alignment_per_slide=objective_alignment_per_slide,
         audience_specificity=audience_specificity,
+        inclusive_imagery_specificity=inclusive_imagery_specificity,
         total=total,
     )

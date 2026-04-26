@@ -12,6 +12,8 @@ from pydantic import BaseModel, Field
 
 from ..state import DeckPlan, GraphState
 from .base import LLMAgent
+from .brand_guardian import brand_guardian_findings
+from .narratologist import narratologist_findings
 
 
 class QAOutput(BaseModel):
@@ -41,6 +43,8 @@ def structural_findings(plan: DeckPlan) -> list[str]:
     citation_total = sum(len(b.citations) for s in plan.slides for b in s.blocks)
     if citation_total == 0:
         issues.append("LOOP: no citations anywhere; cite at least factual claims.")
+    issues.extend(narratologist_findings(plan))
+    issues.extend(brand_guardian_findings(plan))
     return issues
 
 

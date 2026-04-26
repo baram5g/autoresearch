@@ -17,8 +17,8 @@ def test_structural_findings_passes_well_formed_deck():
         [ContentBlock(kind="scenario", body={"scenario": "s"})],
         [ContentBlock(kind="bullets", body={"items": ["y"]})],
         [ContentBlock(kind="bullets", body={"items": ["z"]})],
-        [ContentBlock(kind="bullets", body={"items": ["w"]})],
-        [ContentBlock(kind="bullets", body={"items": ["v"]})],
+        [ContentBlock(kind="bullets", body={"items": ["Document the decision"]})],
+        [ContentBlock(kind="bullets", body={"items": ["Escalate concerns"]})],
     ]
     plan = DeckPlan(
         topic="t",
